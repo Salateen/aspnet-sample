@@ -28,7 +28,7 @@ stages:
   jobs:
   - job: release
     steps:
-    - download: none
+    - checkout: none
     - task: DownloadPipelineArtifact@2
       inputs:
         buildType: 'current'
