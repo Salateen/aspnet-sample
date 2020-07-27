@@ -7,11 +7,30 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
-
+  vmImage: 'windows-2019'
 variables:
   buildConfiguration: 'Release'
-
-steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+  
+stages:
+- stage: release
+  jobs:
+    - job: release
+      steps:
+      - checkout: none
+      
+      - task: DownloadGitHubRelease@0
+        inputs:
+          connection: 'github.com_Salateen'
+          userRepository: 'Salateen/aspnet-sample'
+          defaultVersionType: 'latest'
+          downloadPath: '$(Build.ArtifactStagingDirectory)'
+      - task: AzureRmWebAppDeployment@4
+        inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'AzureServiceConnection'
+          appType: 'webApp'
+          WebAppName: 'aspNetsample2'
+          deployToSlotOrASE: true
+          ResourceGroupName: 'aspnet-sample'
+          SlotName: 'production'
+          packageForLinux: '$(Build.ArtifactStagingDirectory)/aspnet-sample.zip'
