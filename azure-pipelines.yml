@@ -33,4 +33,4 @@ stages:
           deployToSlotOrASE: true
           ResourceGroupName: 'aspnet-sample'
           SlotName: 'production'
-          packageForLinux: '$(Build.ArtifactStagingDirectory)/publish.zip'
+          packageForLinux: '$(Build.ArtifactStagingDirectory)/aspnet-sample.zip'
