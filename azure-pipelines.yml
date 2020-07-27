@@ -8,29 +8,36 @@ trigger:
 
 pool:
   vmImage: 'windows-2019'
-variables:
-  buildConfiguration: 'Release'
-  
+
 stages:
+- stage: build
+  jobs:
+  - job: build
+    steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'drop'
+        publishLocation: 'pipeline'
 - stage: release
   jobs:
-    - job: release
-      steps:
-      - checkout: none
-      
-      - task: DownloadGitHubRelease@0
-        inputs:
-          connection: 'github.com_Salateen'
-          userRepository: 'Salateen/aspnet-sample'
-          defaultVersionType: 'latest'
-          downloadPath: '$(Build.ArtifactStagingDirectory)'
-      - task: AzureRmWebAppDeployment@4
-        inputs:
-          ConnectionType: 'AzureRM'
-          azureSubscription: 'AzureServiceConnection'
-          appType: 'webApp'
-          WebAppName: 'aspNetsample2'
-          deployToSlotOrASE: true
-          ResourceGroupName: 'aspnet-sample'
-          SlotName: 'production'
-          packageForLinux: '$(Build.ArtifactStagingDirectory)/aspnet-sample.zip'
+  - job: release
+    steps:
+    - checkout: none
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'drop'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Azure aspnet-sample RG'
+        appType: 'webApp'
+        WebAppName: 'aspnet-sample-12345'
+        packageForLinux: '$(Build.ArtifactStagingDirectory)/aspnet-sample.zip'
