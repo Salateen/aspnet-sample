@@ -14,7 +14,7 @@ namespace aspnet_sample.tests
         [TestMethod]
         public void FalseShouldBeFalse()
         {
-            Assert.AreEqual(false, true);
+            Assert.AreEqual(false, false);
         }
     }
 }
